@@ -373,6 +373,30 @@ def app_meta() -> AppMeta:
 
 
 @mddoc
+def page_id() -> str | None:
+    """Get the page ID of the currently executing notebook.
+
+    The page ID is a unique identifier for the browser tab/page
+    that is currently connected to the notebook.
+
+    Returns:
+        str | None: The page ID, or None if it cannot be determined.
+    """
+    from marimo._messaging.context import HTTP_REQUEST_CTX
+
+    # Check the current request context first (for the current tab)
+    req = HTTP_REQUEST_CTX.get(None)
+    if req is not None and req.page_id is not None:
+        return req.page_id
+
+    # Fallback to the session's first connection page_id if available
+    try:
+        return query_params().get("page_id")
+    except Exception:
+        return None
+
+
+@mddoc
 def cli_args() -> CLIArgs:
     """Get the command line arguments of a marimo notebook.
 

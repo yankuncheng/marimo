@@ -63,6 +63,7 @@ __all__ = [  # noqa: RUF022
     "notebook_location",
     "outline",
     "output",
+    "page_id",
     "pdf",
     "persistent_cache",
     "plain",
@@ -142,6 +143,7 @@ from marimo._runtime.runtime import (
     defs,
     notebook_dir,
     notebook_location,
+    page_id,
     query_params,
     refs,
 )

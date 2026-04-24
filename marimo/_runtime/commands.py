@@ -96,6 +96,7 @@ class HTTPRequest(Mapping[str, Any]):
     cookies: dict[str, str]
     meta: dict[str, Any]  # User-defined storage
     user: Any
+    page_id: str | None = None  # Unique ID for the browser tab
 
     # We don't include session or auth because they may contain
     # information that the app author does not want to expose.
@@ -161,6 +162,7 @@ class HTTPRequest(Mapping[str, Any]):
             cookies=request.cookies,
             user=request.get("user", {}),
             meta=request.get("meta", {}),
+            page_id=request.headers.get("marimo-page-id", request.query_params.get("page_id")),
             # Left out for now. This may contain information that the app author
             # does not want to expose.
             # session=request.session if "session" in request else {},

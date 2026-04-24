@@ -118,7 +118,7 @@ export class RuntimeManager {
       }
     });
 
-    searchParams.set("pageId", this.pageId+""); //TODO(sqlpy)
+    searchParams.set("page_id", this.pageId+""); //TODO(sqlpy)
     searchParams.set(KnownQueryParams.sessionId, sessionId);
     return this.formatWsURL("/ws", searchParams);
   }
@@ -139,7 +139,7 @@ export class RuntimeManager {
       }
     });
 
-    searchParams.set("pageId", this.pageId); //TODO(sqlpy)
+    searchParams.set("page_id", this.pageId); //TODO(sqlpy)
     searchParams.set(KnownQueryParams.sessionId, sessionId);
     return this.formatWsURL("/ws_sync", searchParams);
   }
@@ -283,6 +283,7 @@ export class RuntimeManager {
   headers(): KnownHeaders {
     const headers: KnownHeaders = {
       "Marimo-Session-Id": getSessionId(),
+      "Marimo-Page-Id": String(this.pageId),
       "Marimo-Server-Token": this.config.serverToken ?? "",
       // Needed for widgets that need absolute URLs when embedding in an iframe
       // e.g. mpl.interactive()
