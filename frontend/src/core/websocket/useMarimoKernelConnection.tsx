@@ -375,8 +375,8 @@ export function useMarimoKernelConnection(opts: {
       if (runtimeManager.isSameOrigin) {
         return;
       }
-      const p = await (window as any).sqlpy.getPageId();//TODO(sqlpy)
-      runtimeManager.setPageId(p['tab']);//TODO(sqlpy)
+      const p = await (window as any).sqlpy?.getPageId();//TODO(sqlpy)
+      runtimeManager.setPageId(p?.['tab'] ?? '0');       //TODO(sqlpy)
       await runtimeManager.waitForHealthy();
     },
 
