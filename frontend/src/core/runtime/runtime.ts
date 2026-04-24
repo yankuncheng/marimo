@@ -13,6 +13,8 @@ export class RuntimeManager {
   private config: RuntimeConfig;
   private lazy: boolean;
 
+  private pageId: number = 0; //TODO(sqlpy)
+  setPageId(pageId: number) {this.pageId = pageId; } //TODO(sqlpy)
   constructor(config: RuntimeConfig, lazy = false) {
     this.config = config;
     this.lazy = lazy;
@@ -116,6 +118,7 @@ export class RuntimeManager {
       }
     });
 
+    searchParams.set("pageId", this.pageId+""); //TODO(sqlpy)
     searchParams.set(KnownQueryParams.sessionId, sessionId);
     return this.formatWsURL("/ws", searchParams);
   }
@@ -136,6 +139,7 @@ export class RuntimeManager {
       }
     });
 
+    searchParams.set("pageId", this.pageId); //TODO(sqlpy)
     searchParams.set(KnownQueryParams.sessionId, sessionId);
     return this.formatWsURL("/ws_sync", searchParams);
   }
