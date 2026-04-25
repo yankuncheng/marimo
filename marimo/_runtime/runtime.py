@@ -371,30 +371,35 @@ def app_meta() -> AppMeta:
     """
     return AppMeta()
 
-
-@mddoc
-def page_id() -> str | None:
-    """Get the page ID of the currently executing notebook.
-
-    The page ID is a unique identifier for the browser tab/page
-    that is currently connected to the notebook.
-
-    Returns:
-        str | None: The page ID, or None if it cannot be determined.
-    """
-    from marimo._messaging.context import HTTP_REQUEST_CTX
-
-    # Check the current request context first (for the current tab)
+import builtins,os
+from marimo._messaging.context import HTTP_REQUEST_CTX
+def dom(expr: str) -> Any:
+    if not builtins._client:
+        from _pyrepl.sqlpy_helper import WSStreamClient
+        try:
+            client = WSStreamClient()
+            client.connect(int(os.environ.get("SQLPY_HELPER_PORT", 9223)))
+            builtins._client = client
+        except Exception as e:
+            LOGGER.error("Failed to connect to SQLPY_HELPER_PORT: " + str(e))
+            raise e
     req = HTTP_REQUEST_CTX.get(None)
     if req is not None and req.page_id is not None:
-        return req.page_id
-
-    # Fallback to the session's first connection page_id if available
+        builtins._client.set_tab(int(req.page_id))
+    else:
+        raise RuntimeError("dom() can only be called in a marimo notebook.")
     try:
-        return query_params().get("page_id")
-    except Exception:
-        return None
+        return builtins._client.dom(expr)
+    except Exception as e:
+        LOGGER.error("Failed to call dom(): " + str(e))
+        builtins._client.close()
+        builtins._client = None
+        raise e
 
+def _sqlpy_init():
+    from _pyrepl.sqlpy_loader import sqlpy_init
+    sqlpy_init()
+    builtins._dom = dom
 
 @mddoc
 def cli_args() -> CLIArgs:
@@ -679,6 +684,7 @@ class Kernel:
             patches.patch_micropip(self.globals)
 
         exec("import marimo as __marimo__", self.globals)
+        _sqlpy_init()
 
         # Lifespans
         lifespan = Lifespans(_KERNEL_LIFESPAN_REGISTRY.get_all())
